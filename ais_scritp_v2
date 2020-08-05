@@ -1,0 +1,148 @@
+#!/bin/bash
+#This script is run on a fresh install of Raspbian Buster Lite.
+#It requires Wi-Fi setup and Internet connectivity  
+#It updates the operating system, installs dependancies and fixes bugs
+#It installs the following applications: rtl-ais, kalibrate-rtl, aisdispatcher and ais_JSON
+#It creates and enables rtl_ais, aisdispatcher and ais_JSON services
+#Based on SARCNET AIS Rasp Receiver
+
+echo Setting up AIS for RTL-SDR 
+
+#Setup Directories
+mkdir ~/Downloads
+
+echo Updating the operating system
+sudo apt-get update
+sudo apt-get -y upgrade
+echo System has been updated!
+
+echo Installing dependancies
+sudo apt-get -y install git rtl-sdr librtlsdr-dev libtool libfftw3-dev
+
+echo Fixing a bug in the librtlsdr package configuration file
+sudo /bin/sh -c 'cat > /usr/lib/arm-linux-gnueabihf/pkgconfig/librtlsdr.pc <<\EOF
+prefix=/usr
+libdir=${prefix}/lib/arm-linux-gnueabihf
+includedir=${prefix}/include
+Name: RTL-SDR Library
+Description: C Utility Library
+Version: 0.6.0
+Cflags: -I${includedir}/
+Libs: -L${libdir} -lrtlsdr
+Libs.private: -lusb-1.0
+EOF'
+
+cd ~/Downloads
+
+
+echo Installing Kalibrat-RTL
+git clone https://github.com/steve-m/kalibrate-rtl
+cd kalibrate-rtl
+./bootstrap && CXXFLAGS='-W -Wall -O3'
+./configure
+make
+sudo make install
+
+
+cd ~/Downloads
+wget https://www.aishub.net/downloads/aisdispatcher_arm_glibc.tar.gz
+tar -xzf aisdispatcher_arm_glibc.tar.gz
+rm aisdispatcher_arm_glibc.tar.gz
+
+echo Getting AIS applications
+git clone https://github.com/dgiardini/rtl-ais.git
+echo Installing rtl_ais
+cd ~/Downloads/rtl-ais
+make 
+sudo make install
+
+cd ~
+echo Installing aisdispatcher
+sudo cp -p ~/Downloads/aisdispatcher_arm_glibc/aisdispatcher /usr/local/bin
+
+cd ~
+
+echo Creating and enabling an aisdispatcher service
+sudo /bin/sh -c 'cat > /etc/systemd/system/aisdispatcher.service <<\EOF
+[Unit]
+Description=AIS Dispatcher service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/aisdispatcher -u -G -h 127.0.0.1 -p 10110 -H 54.225.113.225:5322,5.9.207.224:8742,127.0.0.1:5000,178.162.215.175:31547
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+sudo chmod 644 /etc/systemd/system/aisdispatcher.service
+
+sudo systemctl enable aisdispatcher.service
+
+
+
+
+echo Creating and enabling a rtl_ais service
+sudo /bin/sh -c 'cat > /etc/systemd/system/rtl_ais.service <<\EOF
+[Unit]
+Description=AIS Dispatcher service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/rtl_ais -p 0
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+sudo chmod 644 /etc/systemd/system/rtl_ais.service
+
+sudo systemctl enable rtl_ais.service
+
+
+
+
+echo Installing ais_JSON
+
+cd ~
+git clone https://github.com/hsiboy/ais_json.git
+pip install libais
+pip install termcolor
+
+echo Creating and enabling a AIS_JSON service
+sudo /bin/sh -c 'cat > /etc/systemd/system/ais_JSON.service <<\EOF
+[Unit]
+Description=AIS JSON Encode
+After=network.target
+
+[Service]
+ExecStart= /usr/bin/python /home/pi/ais_json/ais_json.py
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+EOF'
+
+sudo chmod 644 /etc/systemd/system/ais_JSON.service
+
+sudo systemctl enable ais_JSON.service
+
+
+echo Rebooting...
+sleep 10
+sudo reboot
