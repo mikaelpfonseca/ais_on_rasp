@@ -69,7 +69,7 @@ Description=AIS Dispatcher service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/aisdispatcher -u -G -h 127.0.0.1 -p 10110 -H 54.225.113.225:5322,5.9.207.224:8742,127.0.0.1:5000,178.162.215.175:31547
+ExecStart=/usr/local/bin/aisdispatcher -u -G -h 127.0.0.1 -p 10110 -H 54.225.113.225:5322,109.200.19.151:4001,195.201.71.220:5964,127.0.0.1:5000
 WorkingDirectory=/home/pi
 StandardOutput=inherit
 StandardError=inherit
