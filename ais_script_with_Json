@@ -58,6 +58,7 @@ echo Installing rtl_ais
 cd ~/Downloads/rtl-ais
 make 
 sudo make install
+sudo cp /home/pi/Downloads/rtl-ais/rtl_ais /usr/local/bin/
 
 cd ~
 echo Installing aisdispatcher
