@@ -22,8 +22,10 @@ sudo apt-get -y install git rtl-sdr librtlsdr-dev libtool libfftw3-dev
 echo Fixing a bug in the librtlsdr package configuration file
 sudo /bin/sh -c 'cat > /usr/lib/arm-linux-gnueabihf/pkgconfig/librtlsdr.pc <<\EOF
 prefix=/usr
-libdir=${prefix}/lib/arm-linux-gnueabihf
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
 includedir=${prefix}/include
+
 Name: RTL-SDR Library
 Description: C Utility Library
 Version: 0.6.0
@@ -36,6 +38,7 @@ cd ~/Downloads
 
 
 echo Installing Kalibrat-RTL
+sudo apt install build-essential libtool automake autoconf librtlsdr-dev libfftw3-dev
 git clone https://github.com/steve-m/kalibrate-rtl
 cd kalibrate-rtl
 ./bootstrap && CXXFLAGS='-W -Wall -O3'
@@ -69,7 +72,7 @@ Description=AIS Dispatcher service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/aisdispatcher -u -G -h 127.0.0.1 -p 10110 -H 54.225.113.225:5322,109.200.19.151:4001,195.201.71.220:5964,127.0.0.1:5000
+ExecStart=/usr/local/bin/aisdispatcher -u -G -h 127.0.0.1 -p 10110 -H 54.225.113.225:5322,5.9.207.224:8742,127.0.0.1:5000,178.162.215.175:31547
 WorkingDirectory=/home/pi
 StandardOutput=inherit
 StandardError=inherit
@@ -115,7 +118,11 @@ sudo systemctl enable rtl_ais.service
 echo Installing ais_JSON
 
 cd ~
+
+sudo apt-get install python-pip -y
 git clone https://github.com/hsiboy/ais_json.git
+sudo apt-get install python-pip
+pip install requests
 pip install libais
 pip install termcolor
 
