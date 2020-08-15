@@ -31,7 +31,7 @@ Libs: -L${libdir} -lrtlsdr
 Libs.private: -lusb-1.0
 EOF'
 
-
+cd ~
 echo Installing Kalibrat-RTL
 sudo apt install build-essential libtool automake autoconf librtlsdr-dev libfftw3-dev
 git clone https://github.com/mikaelpfonseca/kalibrate-rtl
@@ -41,25 +41,24 @@ cd kalibrate-rtl
 make
 sudo make install
 
-
+cd ~
 echo Installig AISDISPATCHER
 wget https://www.aishub.net/downloads/aisdispatcher_arm_glibc.tar.gz
 tar -xzf aisdispatcher_arm_glibc.tar.gz
 rm aisdispatcher_arm_glibc.tar.gz
-echo Installing aisdispatcher
-sudo cp -p ~/aisdispatcher_arm_glibc/aisdispatcher /usr/local/bin
+sudo cp -p aisdispatcher_arm_glibc/aisdispatcher /usr/local/bin
 
-
-
+cd ~
 echo Installing RTL-AIS
 git clone https://github.com/mikaelpfonseca/rtl-ais
 cd rtl-ais
 make 
 sudo make install
-sudo cp -p ~/rtl-ais/rtl_ais /usr/local/bin/
+cd ~
+sudo cp -p rtl-ais/rtl_ais /usr/local/bin/
 
 
-
+cd ~
 echo Installing ais_JSON
 sudo apt-get install python-pip -y
 git clone https://github.com/mikaelpfonseca/ais_json
