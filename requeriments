@@ -17,5 +17,5 @@ pip install libais
 pip install termcolor
 
 echo Rebooting
-sud reboot
+sudo reboot
 
