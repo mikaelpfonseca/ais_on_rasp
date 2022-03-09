@@ -18,4 +18,3 @@ pip install termcolor
 
 echo Rebooting
 sudo reboot
-
