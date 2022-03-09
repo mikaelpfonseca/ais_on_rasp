@@ -6,11 +6,6 @@
 #It creates and enables ais_JSON service
 #Based on SARCNET AIS Rasp Receiver
 
-echo Updating the operating system
-sudo apt-get update
-sudo apt-get -y upgrade
-echo System has been updated!
-
 cd ~
 echo Installing ais_JSON
 git clone https://github.com/mikaelpfonseca/ais_json
