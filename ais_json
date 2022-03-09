@@ -1,0 +1,40 @@
+#!/bin/bash
+#This script is run on a fresh install of Raspbian Buster Lite.
+#It requires Wi-Fi setup and Internet connectivity  
+#It updates the operating system, installs dependancies and fixes bugs
+#It installs the following applications: ais_JSON
+#It creates and enables ais_JSON service
+#Based on SARCNET AIS Rasp Receiver
+
+echo Updating the operating system
+sudo apt-get update
+sudo apt-get -y upgrade
+echo System has been updated!
+
+cd ~
+echo Installing ais_JSON
+git clone https://github.com/mikaelpfonseca/ais_json
+
+echo Creating and enabling a AIS_JSON service
+sudo /bin/sh -c 'cat > /etc/systemd/system/ais_json.service <<\EOF
+[Unit]
+Description=AIS JSON Encode
+After=network.target
+
+[Service]
+ExecStart= /usr/bin/python /home/pi/ais_json/ais_json.py
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+EOF'
+
+sudo chmod 644 /etc/systemd/system/ais_json.service
+
+sudo systemctl enable ais_json.service
+

@@ -1,0 +1,21 @@
+#!/bin/bash
+#This script is run on a fresh install of Raspbian Buster Lite.
+#It requires Wi-Fi setup and Internet connectivity  
+#It updates the operating system, installs dependancies and fixes bugs
+#Based on SARCNET AIS Rasp Receiver
+
+echo Updating the operating system
+sudo apt-get update
+sudo apt-get -y upgrade
+echo System has been updated!
+
+echo Installing dependancies
+sudo apt-get install python-pip -y
+sudo apt-get install git -y
+pip install requests
+pip install libais
+pip install termcolor
+
+echo Rebooting
+sud reboot
+
